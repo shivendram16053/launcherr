@@ -12,7 +12,8 @@ const Navbar = () => {
   useEffect(() => {
     if (connected && publicKey) {
       // Get the wallet's public key
-      setUserAddress(publicKey.toString());
+      setUserAddress(publicKey.toBase58());
+      localStorage.setItem("publickey",publicKey.toBase58());
     } else {
       setUserAddress(null); // Reset address if disconnected
     }
