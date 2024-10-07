@@ -6,17 +6,36 @@ import { TrendingUp } from "lucide-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
+import OnboardingForm from "../forms/Onboarding"; // Import your OnboardingForm
+import { useRouter } from "next/navigation";
 
 const Hero = () => {
-  const { connected } = useWallet();
+  const { connected, publicKey } = useWallet();
   const [userAddress, setUserAddress] = useState<string | null>(null);
-
-  let publickey: string | null;
+  const router = useRouter();
 
   useEffect(() => {
-    publickey = localStorage.getItem("publickey");
-    setUserAddress(publickey);
-  }, []);
+    if (connected && publicKey) {
+      const address = publicKey.toBase58();
+      setUserAddress(address);
+      localStorage.setItem("publickey", address);
+
+      // Check if the user exists in the database
+      const checkUser = async () => {
+        const response = await fetch(`/api/users/check?publicKey=${address}`);
+        const data = await response.json();
+
+        // If the user does not exist, show the onboarding form
+        if (!data.exists) {
+          router.push("/onboardingform")
+        } 
+      };
+
+      checkUser();
+    } else {
+      setUserAddress(null);
+    }
+  }, [connected, publicKey]);
 
   return (
     <main className="max-w-4xl lg:max-w-7xl mx-auto p-6 mt-20">
@@ -30,17 +49,18 @@ const Hero = () => {
           with upvotes, reviews, and tips.
         </p>
         {!userAddress && !connected ? (
-          <WalletMultiButton className="rounded-full mt-3 shadow-inner  font-medium flex items-center gap-[2px]">
+          <WalletMultiButton className="rounded-full mt-3 shadow-inner font-medium flex items-center gap-[2px]">
             Get Started <TrendingUp className="h-5 text-black/70" />
           </WalletMultiButton>
         ) : (
           <Link href={"/dashboard"}>
-            <Button className="rounded-full mt-3 shadow-inner  font-medium flex items-center gap-[2px]">
+            <Button className="rounded-full mt-3 shadow-inner font-medium flex items-center gap-[2px]">
               Go to Dashboard
             </Button>
           </Link>
         )}
       </div>
+
       <div className="mt-14 border bg-stone-900 h-[800px] rounded-lg"></div>
     </main>
   );

@@ -1,19 +1,33 @@
 "use client";
-import Logo from '../logo/logo'
-import { Button } from '../ui/button'
+import Logo from '../logo/logo';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useEffect, useState } from 'react';
-import { WalletDisconnectButton, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { useRouter } from 'next/navigation';
 
 const Navbar = () => {
   const { connected, publicKey } = useWallet();
   const [userAddress, setUserAddress] = useState<string | null>(null);
 
+  const router = useRouter();
   useEffect(() => {
     if (connected && publicKey) {
-      // Get the wallet's public key
-      setUserAddress(publicKey.toBase58());
-      localStorage.setItem("publickey",publicKey.toBase58());
+      const address = publicKey.toBase58();
+      setUserAddress(address);
+      localStorage.setItem("publickey", address);
+
+      // Check if the user exists in the database
+      const checkUser = async () => {
+        const response = await fetch(`/api/users/check?publicKey=${address}`);
+        const data = await response.json();
+        
+        // If the user does not exist, show the onboarding form
+        if (!data.exists) {
+          router.push("/onboardingform");
+        }
+      };
+
+      checkUser();
     } else {
       setUserAddress(null); // Reset address if disconnected
     }
@@ -28,7 +42,7 @@ const Navbar = () => {
         <WalletMultiButton />
       </nav>
     </div>
-  )
-}
+  );
+};
 
 export default Navbar;
