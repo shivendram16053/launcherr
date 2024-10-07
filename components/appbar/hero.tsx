@@ -3,10 +3,15 @@
 
 import React, { useEffect, useState } from "react";
 import { TrendingUp } from "lucide-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const WalletMultiButton = dynamic(
+  async () => (await import('@solana/wallet-adapter-react-ui')).WalletMultiButton,
+  { ssr: false }
+)
 
 const Hero = () => {
   const { connected, publicKey } = useWallet();

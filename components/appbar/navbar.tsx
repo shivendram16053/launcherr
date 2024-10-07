@@ -2,10 +2,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import Logo from '../logo/logo';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useEffect, useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+
+const WalletMultiButton = dynamic(
+  async () => (await import('@solana/wallet-adapter-react-ui')).WalletMultiButton,
+  { ssr: false }
+)
 
 const Navbar = () => {
   const { connected, publicKey } = useWallet();

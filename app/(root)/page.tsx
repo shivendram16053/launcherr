@@ -1,3 +1,5 @@
+"use client";
+
 import Hero from '@/components/appbar/hero'
 import Navbar from '@/components/appbar/navbar'
 import React from 'react'
