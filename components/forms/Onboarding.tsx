@@ -1,21 +1,26 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // Import useRouter
 
-interface OnboardingFormProps {
-  publicKey: string; // Define the type for publicKey
-}
 
-const OnboardingForm: React.FC<OnboardingFormProps> = ({ publicKey }) => {
+const OnboardingForm = () => {
+  const [userAddress, setUserAddress] = useState<string>('');
+
+  useEffect(() => {
+    const publicKey = localStorage.getItem("publickey");
+    console.log("publicKey", publicKey)
+    setUserAddress(publicKey || ''); 
+  }, []);
   const router = useRouter(); // Initialize router
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget); // Use event.currentTarget to get the form
     const data = Object.fromEntries(formData.entries());
-    data.publicKey = publicKey; // Include the public key
+    data.publicKey = userAddress; // Include the public key
 
+    
     const response = await fetch("/api/users/onboard", {
       method: "POST",
       headers: {
@@ -23,6 +28,7 @@ const OnboardingForm: React.FC<OnboardingFormProps> = ({ publicKey }) => {
       },
       body: JSON.stringify(data),
     });
+    console.log("Data",data)
 
     if (response.ok) {
       // Handle successful onboarding, e.g., redirect to dashboard
@@ -56,11 +62,6 @@ const OnboardingForm: React.FC<OnboardingFormProps> = ({ publicKey }) => {
         required
         type="email"
         placeholder="Email"
-        className="p-2 border border-gray-300 rounded"
-      />
-      <input
-        name="bio"
-        placeholder="Short Bio"
         className="p-2 border border-gray-300 rounded"
       />
       <input

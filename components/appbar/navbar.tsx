@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import Logo from '../logo/logo';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
@@ -7,13 +9,11 @@ import { useRouter } from 'next/navigation';
 
 const Navbar = () => {
   const { connected, publicKey } = useWallet();
-  const [userAddress, setUserAddress] = useState<string | null>(null);
 
   const router = useRouter();
   useEffect(() => {
     if (connected && publicKey) {
       const address = publicKey.toBase58();
-      setUserAddress(address);
       localStorage.setItem("publickey", address);
 
       // Check if the user exists in the database
@@ -23,15 +23,16 @@ const Navbar = () => {
         
         // If the user does not exist, show the onboarding form
         if (!data.exists) {
-          router.push("/onboardingform");
+          router.push("/onboarding");
         }
-      };
-
+      } 
       checkUser();
     } else {
-      setUserAddress(null); // Reset address if disconnected
+      localStorage.removeItem("publickey");
     }
   }, [connected, publicKey]);
+
+  
 
   return (
     <div className='max-w-4xl lg:max-w-7xl mx-auto p-6 flex items-center justify-between'>

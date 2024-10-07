@@ -1,12 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Button } from "../ui/button";
 import { TrendingUp } from "lucide-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
-import OnboardingForm from "../forms/Onboarding"; // Import your OnboardingForm
 import { useRouter } from "next/navigation";
 
 const Hero = () => {
@@ -27,7 +26,7 @@ const Hero = () => {
 
         // If the user does not exist, show the onboarding form
         if (!data.exists) {
-          router.push("/onboardingform")
+          router.push("/onboarding")
         } 
       };
 
