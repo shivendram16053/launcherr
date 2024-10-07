@@ -49,14 +49,12 @@ const Hero = () => {
           with upvotes, reviews, and tips.
         </p>
         {!userAddress && !connected ? (
-          <WalletMultiButton className="rounded-full mt-3 shadow-inner font-medium flex items-center gap-[2px]">
+          <WalletMultiButton style={{marginTop: "12px"}}>
             Get Started <TrendingUp className="h-5 text-black/70" />
           </WalletMultiButton>
         ) : (
-          <Link href={"/dashboard"}>
-            <Button className="rounded-full mt-3 shadow-inner font-medium flex items-center gap-[2px]">
+          <Link href={"/dashboard"} className="h-9 md:h-10 px-4 py-3 w-fit rounded-full text-sm mt-3 font-medium flex items-center gap-[2px] bg-primary text-primary-foreground hover:bg-primary/90">
               Go to Dashboard
-            </Button>
           </Link>
         )}
       </div>
