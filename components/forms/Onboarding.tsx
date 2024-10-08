@@ -115,7 +115,10 @@ export default function OnboardingForm() {
       body: JSON.stringify(formData),
     });
 
+    const data = await response.json();
+
     if (response.ok) {
+      localStorage.setItem("userId",data.userId);
       router.push("/dashboard");
     } else {
       console.error("Onboarding failed");
