@@ -118,7 +118,7 @@ export default function OnboardingForm() {
     const data = await response.json();
 
     if (response.ok) {
-      localStorage.setItem("userId",data.userId);
+      localStorage.setItem("userId", data.userId);
       router.push("/dashboard");
     } else {
       console.error("Onboarding failed");
@@ -159,9 +159,10 @@ export default function OnboardingForm() {
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Get Ready to Launch!</h3>
                     <p className="text-sm text-zinc-400">Just a few steps left to unlock <span className="font-medium text-white">Founder Mode.</span> Set up your account and start your journey!.</p>
-                    <Button type="button" onClick={handleNext} className="w-full bg-zinc-100 text-zinc-900 hover:bg-zinc-200">
-                      Get Started <ChevronRight className="ml-2 h-4 w-4" />
+                    <Button size="sm" type="button" onClick={handleNext} className=" bg-zinc-100 text-zinc-900 w-full hover:bg-zinc-200 font-semibold">
+                      Get Started <ChevronRight className="font-semibold ml-0.5 h-4 w-4" />
                     </Button>
+
                   </div>
                 )}
                 {currentStep === 1 && (
@@ -265,7 +266,7 @@ export default function OnboardingForm() {
                       <Label htmlFor="ageVerified" className="text-zinc-300">I confirm that I am 18 years or older</Label>
                     </div>
                     <div className="pt-4">
-                      <Button type="submit" className="w-full bg-zinc-100 text-zinc-900 hover:bg-zinc-200" disabled={
+                      <Button size="sm" type="submit" className="w-full bg-zinc-100 text-zinc-900 hover:bg-zinc-200" disabled={
                         formData.ageVerified !== true
                       }>
                         Complete Registration <Shield className="ml-2 h-4 w-4" />
@@ -278,19 +279,21 @@ export default function OnboardingForm() {
             {currentStep > 0 && currentStep < steps.length - 1 && (
               <div className="flex justify-between mt-6">
                 <Button
+                  size="sm"
                   type="button"
                   variant="outline"
                   onClick={handleBack}
-                  className="bg-stone-900 text-zinc-100 border-stone-800 hover:bg-stone-800 hover:text-zinc-100"
+                  className="bg-stone-900  text-zinc-100 border-stone-800 hover:bg-stone-800 hover:text-zinc-100"
                 >
                   Back
                 </Button>
                 <Button
                   type="button"
+                  size="sm"
                   onClick={handleNext}
-                  className="bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
+                  className="bg-zinc-100 font-semibold text-zinc-900 hover:bg-zinc-200"
                 >
-                  Next <ChevronRight className="ml-2 h-4 w-4" />
+                  Next <ChevronRight className="ml-0.5 font-semibold h-4 w-4" />
                 </Button>
               </div>
             )}

@@ -1,69 +1,78 @@
-"use client";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+'use client'
 
-const ProductForm = () => {
+import React, { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ChevronRight, ChevronLeft, Upload, Rocket, Link, Users, BarChart } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useRouter } from "next/navigation"
+
+const steps = [
+  { title: 'Basic Info', icon: Rocket },
+  { title: 'Product Details', icon: Link },
+  { title: 'Team & Funding', icon: Users },
+  { title: 'Metrics', icon: BarChart },
+];
+
+export default function ProductForm() {
+  const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState({
     name: "",
     tagline: "",
     description: "",
-    isOpenSource: false,
+    isOpenSource: true,
     githubLink: "",
     twitter: "",
     topic: "",
     comment: "",
     status: "startup",
     pitchVideoUrl: "",
-  });
+  })
 
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [ogImageFile, setOgImageFile] = useState<File | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [ogImageFile, setOgImageFile] = useState<File | null>(null)
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter()
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, files } = e.target;
+    const { name, files } = e.target
     if (files && files.length > 0) {
-      if (name === "logo") setLogoFile(files[0]);
-      if (name === "ogImage") setOgImageFile(files[0]);
+      if (name === "logo") setLogoFile(files[0])
+      if (name === "ogImage") setOgImageFile(files[0])
     }
-  };
+  }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-
-    if (type === "checkbox") {
-      setFormData((prev) => ({ ...prev, [name]: (e.target as HTMLInputElement).checked }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
+  const handleChange = (name: string, value: string | boolean) => {
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = (error) => reject(error)
+    })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+    e.preventDefault()
+    setIsSubmitting(true)
 
     try {
-      // Convert files to base64
-      const logoBase64 = logoFile ? await convertToBase64(logoFile) : "";
-      const ogImageBase64 = ogImageFile ? await convertToBase64(ogImageFile) : "";
+      const logoBase64 = logoFile ? await convertToBase64(logoFile) : ""
+      const ogImageBase64 = ogImageFile ? await convertToBase64(ogImageFile) : ""
 
       const finalFormData = {
         ...formData,
         logoFile: logoBase64,
         ogImageFile: ogImageBase64,
-        userId: localStorage.getItem('userId'),  // Assuming userId is stored in localStorage
-      };
+        userId: localStorage.getItem('userId'),
+      }
 
       const res = await fetch("/api/products/create", {
         method: "POST",
@@ -71,185 +80,253 @@ const ProductForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(finalFormData),
-      });
+      })
 
       if (res.ok) {
-        router.push("/dashboard");
+        router.push("/dashboard")
       } else {
-        console.error("Error creating product");
+        console.error("Error creating product")
       }
     } catch (error) {
-      console.error("Error during form submission", error);
+      console.error("Error during form submission", error)
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
+  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1))
+  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 0))
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-lg mx-auto space-y-6 p-8 rounded shadow"
-    >
-      <h2 className="text-2xl font-bold mb-4">Create New Product</h2>
+    <div className="max-w-2xl p-8 lg:p-12 mx-auto h-screen flex flex-col items-center justify-center">
+      {/* Progress bar */}
+      
+      {/* Form */}
+      <div className="w-full">
+        <form className="max-w-2xl mx-auto">
+          <AnimatePresence mode="wait">
+            {currentStep === 0 && (
+              <motion.div
+                key="step1"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <h3 className="text-2xl font-semibold  mb-6">Basic Information</h3>
+                <div className="space-y-2">
+                  <label htmlFor="name" className="text-sm font-medium ">Project Name</label>
+                  <Input
+                    id="name"
+                    name="name"
+                    placeholder="Enter your product name"
+                    value={formData.name}
+                    onChange={(e) => handleChange("name", e.target.value)}
+                    required
+                    className="w-full bg-stone-900 text-zinc-100 border-stone-800 focus:border-zinc-500"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="tagline" className="text-sm font-medium">Tagline</label>
+                  <Input
+                    id="tagline"
+                    name="tagline"
+                    placeholder="Enter a catchy tagline"
+                    value={formData.tagline}
+                    onChange={(e) => handleChange("tagline", e.target.value)}
+                    required
+                    className="w-full bg-stone-900 text-zinc-100 border-stone-800 focus:border-zinc-500"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="description" className="text-sm font-medium ">Description</label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    placeholder="Describe your product"
+                    value={formData.description}
+                    onChange={(e) => handleChange("description", e.target.value)}
+                    required
+                    className="w-full min-h-[100px] bg-stone-900 text-zinc-100 border-stone-800 focus:border-zinc-500"
+                  />
+                </div>
+              </motion.div>
+            )}
 
-      {/* Product Name */}
-      <div>
-        <label className="block mb-1 text-sm font-medium">Product Name</label>
-        <input
-          type="text"
-          name="name"
-          placeholder="Product Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
+            {currentStep === 1 && (
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <h3 className="text-2xl font-semibold  mb-6">Chakra Details</h3>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="isOpenSource"
+                    checked={formData.isOpenSource}
+                    onCheckedChange={(checked) => handleChange("isOpenSource", checked)}
+                  />
+                  <label htmlFor="isOpenSource" className="text-sm font-medium ">Is Open Source</label>
+                </div>
+                {formData.isOpenSource && (
+                  <div className="space-y-2">
+                    <label htmlFor="githubLink" className="text-sm font-medium ">GitHub Link</label>
+                    <Input
+                      id="githubLink"
+                      name="githubLink"
+                      placeholder="Enter GitHub repository URL"
+                      value={formData.githubLink}
+                      onChange={(e) => handleChange("githubLink", e.target.value)}
+                      className="w-full bg-stone-900 text-zinc-100 border-stone-800 focus:border-zinc-500"
+                    />
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <label htmlFor="twitter" className="text-sm font-medium ">Twitter Handle</label>
+                  <Input
+                    id="twitter"
+                    name="twitter"
+                    placeholder="Enter Twitter handle"
+                    value={formData.twitter}
+                    onChange={(e) => handleChange("twitter", e.target.value)}
+                    required
+                    className="w-full bg-stone-900 text-zinc-100 border-stone-800 focus:border-zinc-500"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="topic" className="text-sm font-medium ">Topic</label>
+                  <Input
+                    id="topic"
+                    name="topic"
+                    placeholder="Enter product topic"
+                    value={formData.topic}
+                    onChange={(e) => handleChange("topic", e.target.value)}
+                    required
+                    className="w-full bg-stone-900 text-zinc-100 border-stone-800 focus:border-zinc-500"
+                  />
+                </div>
+              </motion.div>
+            )}
+
+            {currentStep === 2 && (
+              <motion.div
+                key="step3"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <h3 className="text-2xl font-semibold  mb-6">Additional Information</h3>
+                <div className="space-y-2">
+                  <label htmlFor="comment" className="text-sm font-medium ">Comment (optional)</label>
+                  <Textarea
+                    id="comment"
+                    name="comment"
+                    placeholder="Add any additional comments"
+                    value={formData.comment}
+                    onChange={(e) => handleChange("comment", e.target.value)}
+                    className="w-full min-h-[100px] bg-stone-900 text-zinc-100 border-stone-800 focus:border-zinc-500"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="status" className="text-sm font-medium ">Product Status</label>
+                  <Select
+                    name="status"
+                    value={formData.status}
+                    onValueChange={(value) => handleChange("status", value)}
+                  >
+                    <SelectTrigger className="w-full bg-stone-900 text-zinc-100 border-stone-800 focus:border-zinc-500">
+                      <SelectValue placeholder="Select product status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="startup">Startup</SelectItem>
+                      <SelectItem value="preexisting">Pre-existing</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="pitchVideoUrl" className="text-sm font-medium ">Loom Pitch Video URL</label>
+                  <Input
+                    id="pitchVideoUrl"
+                    name="pitchVideoUrl"
+                    placeholder="Enter Loom video URL"
+                    value={formData.pitchVideoUrl}
+                    onChange={(e) => handleChange("pitchVideoUrl", e.target.value)}
+                    className="w-full bg-stone-900 text-zinc-100 border-stone-800 focus:border-zinc-500"
+                  />
+                </div>
+              </motion.div>
+            )}
+
+            {currentStep === 3 && (
+              <motion.div
+                key="step4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <h3 className="text-2xl font-semibold  mb-6">Visual Assets</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="logo" className="block text-sm font-medium  mb-2">
+                      Logo
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <Input id="logo" name="logo" type="file" onChange={handleFileChange} className="sr-only" />
+                      <label
+                        htmlFor="logo"
+                        className="cursor-pointer inline-flex items-center px-4 py-2 border  shadow-sm text-sm font-medium rounded-md     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                      >
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload Logo
+                      </label>
+                      {logoFile && <span className="text-sm ">{logoFile.name}</span>}
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="ogImage" className="block text-sm font-medium  mb-2">
+                      OG Image
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <Input id="ogImage" name="ogImage" type="file" onChange={handleFileChange} className="sr-only" />
+                      <label
+                        htmlFor="ogImage"
+                        className="cursor-pointer inline-flex items-center px-4 py-2 border  shadow-sm text-sm font-medium rounded-md    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                      >
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload OG Image
+                      </label>
+                      {ogImageFile && <span className="text-sm ">{ogImageFile.name}</span>}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="flex justify-between mt-12">
+            <Button size="sm" type="button" onClick={prevStep} disabled={currentStep === 0} variant="outline" className="font-semibold bg-stone-900 border-stone-800">
+              <ChevronLeft className="mr-0.5 h-4 w-4" /> Previous
+            </Button>
+            {currentStep < steps.length - 1 ? (
+              <Button size="sm" className="font-semibold shadow-inner" type="button" onClick={nextStep}>
+                Next <ChevronRight className="ml-0.5 h-4 w-4 font-semibold" />
+              </Button>
+            ) : (
+              <Button size="sm" type="button" disabled={isSubmitting} onClick={handleSubmit}>
+                {isSubmitting ? "Submitting..." : "Create Product"}
+              </Button>
+            )}
+          </div>
+        </form>
       </div>
-
-      {/* Tagline */}
-      <div>
-        <label className="block mb-1 text-sm font-medium">Tagline</label>
-        <input
-          type="text"
-          name="tagline"
-          placeholder="Tagline"
-          value={formData.tagline}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      {/* Description */}
-      <div>
-        <label className="block mb-1 text-sm font-medium">Description</label>
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      {/* Open Source */}
-      <div className="flex items-center">
-        <input
-          type="checkbox"
-          name="isOpenSource"
-          checked={formData.isOpenSource}
-          onChange={handleChange}
-          className="mr-2"
-        />
-        <label htmlFor="isOpenSource" className="text-sm">
-          Is Open Source
-        </label>
-      </div>
-
-      {/* GitHub Link (shown if Open Source is checked) */}
-      {formData.isOpenSource && (
-        <div>
-          <label className="block mb-1 text-sm font-medium">GitHub Link</label>
-          <input
-            type="url"
-            name="githubLink"
-            placeholder="GitHub Link"
-            value={formData.githubLink}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-      )}
-
-      {/* Twitter Handle */}
-      <div>
-        <label className="block mb-1 text-sm font-medium">Twitter Handle</label>
-        <input
-          type="url"
-          name="twitter"
-          placeholder="Twitter Handle"
-          value={formData.twitter}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      {/* Topic */}
-      <div>
-        <label className="block mb-1 text-sm font-medium">Topic</label>
-        <input
-          type="text"
-          name="topic"
-          placeholder="Topic"
-          value={formData.topic}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      {/* Comment (optional) */}
-      <div>
-        <label className="block mb-1 text-sm font-medium">
-          Comment (optional)
-        </label>
-        <textarea
-          name="comment"
-          placeholder="Comment"
-          value={formData.comment}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      {/* Product Status */}
-      <div>
-        <label className="block mb-1 text-sm font-medium">Product Status</label>
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          required
-          className="w-full p-2 border rounded"
-        >
-          <option value="startup">Startup</option>
-          <option value="preexisting">Pre-existing</option>
-        </select>
-      </div>
-
-      <input type="file" name="logo" onChange={handleFileChange} />
-      <input type="file" name="ogImage" onChange={handleFileChange} />
-
-      {/* Loom Video URL */}
-      <div>
-        <label className="block mb-1 text-sm font-medium">
-          Loom Pitch Video URL
-        </label>
-        <input
-          type="url"
-          name="pitchVideoUrl"
-          placeholder="Loom Pitch Video URL"
-          value={formData.pitchVideoUrl}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      {/* Submit Button */}
-      <div>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full p-3 bg-white hover:bg-slate-200 text-black rounded"
-        >
-          {isSubmitting ? "Submitting..." : "Create Product"}
-        </button>
-      </div>
-    </form>
-  );
-};
-
-export default ProductForm;
+    </div>
+  )
+}
