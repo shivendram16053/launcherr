@@ -37,6 +37,11 @@ export default function OnboardingForm() {
   const router = useRouter();
 
   useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if(userId){
+      router.push("/dashboard");
+    }
+    
     const publicKey = localStorage.getItem("publickey");
     setFormData(prev => ({ ...prev, publicKey: publicKey || '' }));
   }, []);
