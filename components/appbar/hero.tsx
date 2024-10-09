@@ -62,8 +62,6 @@ const Hero = () => {
           </Link>
         )}
       </div>
-
-      <div className="mt-14 border bg-stone-900 h-[800px] rounded-lg"></div>
     </main>
   );
 };
