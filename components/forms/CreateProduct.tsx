@@ -13,7 +13,7 @@ import { GlobeDemo } from "../glassy-glob"
 
 const steps = [
   { title: 'Basic Info', icon: Rocket },
-  { title: 'Product Details', icon: Link },
+  { title: 'Project Details', icon: Link },
   { title: 'Team & Funding', icon: Users },
   { title: 'Metrics', icon: BarChart },
 ];
@@ -359,7 +359,7 @@ export default function ProductForm() {
           </form>
         </div>
       </div>
-      <div className="h-screen hidden  lg:block w-[700px]">
+      <div className="h-screen hidden  lg:block w-[800px]">
         <GlobeDemo/>
       </div>
     </div>
