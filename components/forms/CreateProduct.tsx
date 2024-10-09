@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
+import { GlobeDemo } from "../glassy-glob"
 
 const steps = [
   { title: 'Basic Info', icon: Rocket },
@@ -99,9 +100,6 @@ export default function ProductForm() {
 
   return (
     <div className="flex ">
-      <div className="h-screen border hidden bg-stone-300 lg:block w-[700px]">
-        <div className="" />
-      </div>
       <div className="col-span-1 max-w-2xl p-8 lg:p-12 mx-auto h-screen flex flex-col items-center justify-center">
         {/* Progress bar */}
         <div className="relative">
@@ -360,6 +358,9 @@ export default function ProductForm() {
             </div>
           </form>
         </div>
+      </div>
+      <div className="h-screen hidden  lg:block w-[700px]">
+        <GlobeDemo/>
       </div>
     </div>
   )
