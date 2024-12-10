@@ -20,14 +20,13 @@ const Dashboard = () => {
   const router = useRouter();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [productError,setProductError] = useState<string|null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const publicKey = localStorage.getItem('publickey');
-    const userId = localStorage.getItem('userId');
-
-    console.log('publicKey', publicKey);
+    
     if (!publicKey) {
       router.push('/');
       return;
@@ -35,7 +34,7 @@ const Dashboard = () => {
 
     const fetchUserProfile = async () => {
       try {
-        const res = await fetch(`/api/users/fetch?userId=${userId}`);
+        const res = await fetch(`/api/users/fetch?publicKey=${publicKey}`);
         if (!res.ok) {
           throw new Error('Failed to fetch user profile');
         }
@@ -44,16 +43,21 @@ const Dashboard = () => {
       } catch (error) {
         console.error('Error fetching user profile:', error);
         setError('An error occurred while fetching the user profile.');
+        router.push('/onboarding')
       }
     };
 
     const fetchProducts = async () => {
       try {
-        const res = await fetch(`/api/products/fetch?userId=${userId}`);
+        const res = await fetch(`/api/products/fetching?publicKey=${publicKey}`);
         if (!res.ok) {
           throw new Error('Failed to fetch products');
         }
         const data = await res.json();
+
+        if(data.length == 0){
+          setProductError("No product found")
+        }
         setProducts(data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -94,6 +98,7 @@ const Dashboard = () => {
 
       <h2 className="text-2xl font-bold mt-8">Your Products</h2>
       <ul className="space-y-4">
+        {productError && <p className='text-red-600'>{productError}</p>}
         {products.map((product) => (
           <li key={product.id} className="p-4 border rounded shadow">
             <h3 className="text-xl font-semibold">{product.name}</h3>

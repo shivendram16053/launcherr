@@ -45,14 +45,24 @@ const Navbar = () => {
         <Logo className="w-8 h-8" />
       </div>
       <div className="flex gap-5 items-center">
-        <Link
-          href={"/createproduct"}
-          className="h-9 md:h-10 px-4 py-3 w-fit rounded-full text-sm font-medium flex items-center gap-[2px] bg-primary text-primary-foreground hover:bg-primary/90"
-        >
-          Create Product
-        </Link>
+        {connected && publicKey && (
+          <Link
+            href={"/createproduct"}
+            className="h-9 md:h-10 px-4 py-3 w-fit rounded-full text-sm font-medium flex items-center gap-[2px] bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            Create Product
+          </Link>
+        )}
         <nav className="flex items-center space-x-4">
-          <WalletMultiButton />
+          {!connected ? <WalletMultiButton /> : 
+          
+          <div>
+            <ul>
+              <li>Profile</li>
+              <li>Products</li>
+              <li>Disconnect</li>
+            </ul>
+          </div>}
         </nav>
       </div>
     </div>

@@ -2,16 +2,16 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url);
-  const userId = searchParams.get("userId");
+  const { searchParams } = new URL(req.url);
+  const publicKey = searchParams.get("publicKey");
 
-  if (!userId) {
+  if (!publicKey) {
     return NextResponse.json({ error: "User ID not found" }, { status: 400 });
   }
 
   try {
     const userProfile = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { publicKey:publicKey },
     });
 
     if (!userProfile) {

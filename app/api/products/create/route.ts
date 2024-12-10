@@ -18,13 +18,12 @@ export async function POST(req: Request) {
       comment,
       status,
       pitchVideoUrl,
-      userId,
       logoFile,
       ogImageFile,
     } = body;
 
     // Validate required fields
-    if (!name || !tagline || !description || !userId) {
+    if (!name || !tagline || !description || !publicKey) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 

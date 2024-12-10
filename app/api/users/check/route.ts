@@ -13,5 +13,5 @@ export async function GET(req: Request) {
     where: { publicKey },
   });
 
-  return NextResponse.json({exists:!!user});
+  return NextResponse.json({exists:true});
 }

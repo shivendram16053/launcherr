@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     });
 
     // Return successful response
-    return NextResponse.json({ message: "User onboarded successfully", userId: newUser.id }, { status: 201 });
+    return NextResponse.json({ message: "User onboarded successfully"}, { status: 201 });
   } catch (error: any) {
     console.error("Error onboarding user:", error);
 

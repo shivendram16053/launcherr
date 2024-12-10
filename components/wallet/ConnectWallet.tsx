@@ -37,7 +37,7 @@ const App = () => {
   const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
   return (
-    <WalletProvider wallets={wallets} autoConnect>
+    <WalletProvider wallets={wallets}>
       <ConnectWallet />
     </WalletProvider>
   );

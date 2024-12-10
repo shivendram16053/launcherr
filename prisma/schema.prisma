@@ -14,19 +14,19 @@ datasource db {
 }
 
 model User {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId // MongoDB _id for User
+  publicKey   String    @unique // Unique publicKey field
   name        String
-  username    String     @unique
-  email       String     @unique
-  publicKey   String     @unique
+  username    String    @unique
+  email       String    @unique
   bio         String
   twitter     String
-  ageVerified Boolean    @default(false)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  products    Product[]  
+  ageVerified Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[] // Relation to products
 
-  @@map("users") 
+  @@map("users")
 }
 
 model Product {
@@ -35,18 +35,32 @@ model Product {
   tagline       String
   description   String
   isOpenSource  Boolean   @default(false)
-  githubLink    String?   
+  githubLink    String?
   twitter       String
-  topic         String    
-  comment       String?   
-  logoUrl       String   
+  topic         String
+  comment       String?
+  logoUrl       String
   ogImageUrl    String?
-  pitchVideoUrl String?   
+  pitchVideoUrl String?
   status        String    // "startup" or "preexisting"
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  userId        String    @db.ObjectId  
-  user          User      @relation(fields: [userId], references: [id])  
+  userPubKey    String    // Store the publicKey of the associated user
+  user          User      @relation(fields: [userPubKey], references: [publicKey]) // Relating to User via publicKey
 
-  @@map("products") 
+  votes         Vote[] // Relation to votes
+
+  @@map("products")
+}
+
+model Vote {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  comment       String
+  publicKey     String
+  vote          String
+  tip           String?  @default("0")
+  productId     String   @db.ObjectId
+  product       Product  @relation(fields: [productId], references: [id])
+
+  @@map("votes")
 }
